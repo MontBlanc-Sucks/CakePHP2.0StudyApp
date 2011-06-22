@@ -29,35 +29,13 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 	<?php
 		echo $this->Html->meta('icon');
 
-		echo $this->Html->css('cake.generic');
+		echo $this->Html->css(array(
+			'cake.generic',
+			'app.menu',
+		));
 
 		echo $scripts_for_layout;
 	?>
-	<style>
-		#menu {
-			width: 100%;
-			height: 2em;
-			background-color: #066;
-			color: #fff;
-		}
-
-		#menu ul {
-			margin: auto;
-			padding: 0;
-		}
-
-		#menu ul li {
-			display: inline-block;
-		}
-
-		#menu ul li a {
-			color: #fff;
-		}
-
-		#menu ul li a:hover {
-			color: #cc9;
-		}
-	</style>
 </head>
 <body>
 	<div id="container">
