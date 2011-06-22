@@ -46,5 +46,10 @@ class PostTestCase extends CakeTestCase {
 		$expected = true;
 		// テスト実行
 		$this->assertEqual($result, $expected);
+		// テスト 2
+		$this->Post->create(array('title' => 'タイトルあり'));
+		$result = array_key_exists('title', $this->Post->invalidFields());
+		$expected = false;
+		$this->assertEqual($result, $expected);
 	}
 }
