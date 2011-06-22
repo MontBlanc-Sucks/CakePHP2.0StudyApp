@@ -45,7 +45,7 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 		<div id="menu">
 			<ul>
 			<?php if (AuthComponent::user()): ?>
-				<li><?php echo $this->Html->link('Posts', array('controller' => 'posts')) ?></li>
+				<li><?php echo $this->Html->link('Posts', array('controller' => 'posts', 'action' => 'index')) ?></li>
 				<li><?php echo $this->Html->link('Logout', array('controller' => 'users', 'action' => 'logout')) ?></li>
 			<?php else: ?>
 				<li><?php echo $this->Html->link('Register', array('controller' => 'users', 'action' => 'register')) ?></li>
