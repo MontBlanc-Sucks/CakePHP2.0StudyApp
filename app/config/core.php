@@ -4,7 +4,7 @@
  *
  * Use it to configure core behavior of Cake.
  *
- * PHP 5
+ * PHP versions 4 and 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -14,7 +14,8 @@
  *
  * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.config
+ * @package       cake
+ * @subpackage    cake.app.config
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -35,46 +36,19 @@
 	Configure::write('debug', 2);
 
 /**
- * Configure the Error handler used to handle errors for your application.  By default
- * ErrorHandler::handleError() is used.  It will display errors using Debugger, when debug > 0
- * and log errors with CakeLog when debug = 0.
+ * CakePHP Log Level:
  *
- * Options:
+ * In case of Production Mode CakePHP gives you the possibility to continue logging errors.
  *
- * - `handler` - callback - The callback to handle errors. You can set this to any callback type,
- *    including anonymous functions.
- * - `level` - int - The level of errors you are interested in capturing.
- * - `trace` - boolean - Include stack traces for errors in log files.
+ * The following parameters can be used:
+ *  Boolean: Set true/false to activate/deactivate logging
+ *    Configure::write('log', true);
  *
- * @see ErrorHandler for more information on error handling and configuration.
+ *  Integer: Use built-in PHP constants to set the error level (see error_reporting)
+ *    Configure::write('log', E_ERROR | E_WARNING);
+ *    Configure::write('log', E_ALL ^ E_NOTICE);
  */
-	Configure::write('Error', array(
-		'handler' => 'ErrorHandler::handleError',
-		'level' => E_ALL & ~E_DEPRECATED,
-		'trace' => true
-	));
-
-/**
- * Configure the Exception handler used for uncaught exceptions.  By default,
- * ErrorHandler::handleException() is used. It will display a HTML page for the exception, and
- * while debug > 0, framework errors like Missing Controller will be displayed.  When debug = 0,
- * framework errors will be coerced into generic HTTP errors.
- *
- * Options:
- *
- * - `handler` - callback - The callback to handle exceptions. You can set this to any callback type,
- *   including anonymous functions.
- * - `renderer` - string - The class responsible for rendering uncaught exceptions.  If you choose a custom class you
- *   should place the file for that class in app/libs. This class needs to implement a render method.
- * - `log` - boolean - Should Exceptions be logged?
- *
- * @see ErrorHandler for more information on exception handling and configuration.
- */
-	Configure::write('Exception', array(
-		'handler' => 'ErrorHandler::handleException',
-		'renderer' => 'ExceptionRenderer',
-		'log' => true
-	));
+	Configure::write('log', true);
 
 /**
  * Application wide charset encoding
@@ -109,6 +83,7 @@
  *	`admin_index()` and `/admin/controller/index`
  *	`manager_index()` and `/manager/controller/index`
  *
+ * [Note Routing.admin is deprecated in 1.3.  Use Routing.prefixes instead]
  */
 	//Configure::write('Routing.prefixes', array('admin'));
 
@@ -122,8 +97,8 @@
  * Enable cache checking.
  *
  * If set to true, for view caching you must still use the controller
- * public $cacheAction inside your controllers to define caching settings.
- * You can either set it controller-wide by setting public $cacheAction = true,
+ * var $cacheAction inside your controllers to define caching settings.
+ * You can either set it controller-wide by setting var $cacheAction = true,
  * or in each action using $this->cacheAction = true.
  *
  */
@@ -136,48 +111,90 @@
 	define('LOG_ERROR', 2);
 
 /**
- * Session configuration.
+ * The preferred session handling method. Valid values:
  *
- * Contains an array of settings to use for session configuration. The defaults key is
- * used to define a default preset to use for sessions, any settings declared here will override
- * the settings of the default config.
+ * 'php'	 		Uses settings defined in your php.ini.
+ * 'cake'		Saves session files in CakePHP's /tmp directory.
+ * 'database'	Uses CakePHP's database sessions.
  *
- * ## Options
- *
- * - `Session.name` - The name of the cookie to use. Defaults to 'CAKEPHP'
- * - `Session.timeout` - The number of minutes you want sessions to live for. This timeout is handled by CakePHP
- * - `Session.cookieTimeout` - The number of minutes you want session cookies to live for.
- * - `Session.checkAgent` - Do you want the user agent to be checked when starting sessions? You might want to set the
- *    value to false, when dealing with older versions of IE, Chrome Frame or certain web-browsing devices and AJAX
- * - `Session.defaults` - The default configuration set to use as a basis for your session.
- *    There are four builtins: php, cake, cache, database.
- * - `Session.handler` - Can be used to enable a custom session handler.  Expects an array of of callables,
- *    that can be used with `session_save_handler`.  Using this option will automatically add `session.save_handler`
- *    to the ini array.
- * - `Session.autoRegenerate` - Enabling this setting, turns on automatic renewal of sessions, and
- *    sessionids that change frequently. See CakeSession::$requestCountdown.
- * - `Session.ini` - An associative array of additional ini values to set.
- *
- * The built in defaults are:
- *
- * - 'php' -Uses settings defined in your php.ini.
- * - 'cake' - Saves session files in CakePHP's /tmp directory.
- * - 'database' - Uses CakePHP's database sessions.
- * - 'cache' - Use the Cache class to save sessions.
- *
- * To define a custom session handler, save it at /app/libs/session/<name>.php.
- * Make sure the class implements `CakeSessionHandlerInterface` and set Session.handler to <name>
+ * To define a custom session handler, save it at /app/config/<name>.php.
+ * Set the value of 'Session.save' to <name> to utilize it in CakePHP.
  *
  * To use database sessions, run the app/config/schema/sessions.php schema using
  * the cake shell command: cake schema create Sessions
  *
  */
-	Configure::write('Session', array(
-		'defaults' => 'php'
-	));
+	Configure::write('Session.save', 'php');
 
 /**
- * The level of CakePHP security.
+ * The model name to be used for the session model.
+ *
+ * 'Session.save' must be set to 'database' in order to utilize this constant.
+ *
+ * The model name set here should *not* be used elsewhere in your application.
+ */
+	//Configure::write('Session.model', 'Session');
+
+/**
+ * The name of the table used to store CakePHP database sessions.
+ *
+ * 'Session.save' must be set to 'database' in order to utilize this constant.
+ *
+ * The table name set here should *not* include any table prefix defined elsewhere.
+ *
+ * Please note that if you set a value for Session.model (above), any value set for
+ * Session.table will be ignored.
+ *
+ * [Note: Session.table is deprecated as of CakePHP 1.3]
+ */
+	//Configure::write('Session.table', 'cake_sessions');
+
+/**
+ * The DATABASE_CONFIG::$var to use for database session handling.
+ *
+ * 'Session.save' must be set to 'database' in order to utilize this constant.
+ */
+	//Configure::write('Session.database', 'default');
+
+/**
+ * The name of CakePHP's session cookie.
+ *
+ * Note the guidelines for Session names states: "The session name references
+ * the session id in cookies and URLs. It should contain only alphanumeric
+ * characters."
+ * @link http://php.net/session_name
+ */
+	Configure::write('Session.cookie', 'CAKEPHP');
+
+/**
+ * Session time out time (in seconds).
+ * Actual value depends on 'Security.level' setting.
+ */
+	Configure::write('Session.timeout', '120');
+
+/**
+ * If set to false, sessions are not automatically started.
+ */
+	Configure::write('Session.start', true);
+
+/**
+ * When set to false, HTTP_USER_AGENT will not be checked
+ * in the session. You might want to set the value to false, when dealing with
+ * older versions of IE, Chrome Frame or certain web-browsing devices and AJAX
+ */
+	Configure::write('Session.checkAgent', true);
+
+/**
+ * The level of CakePHP security. The session timeout time defined
+ * in 'Session.timeout' is multiplied according to the settings here.
+ * Valid values:
+ *
+ * 'high'   Session timeout in 'Session.timeout' x 10
+ * 'medium' Session timeout in 'Session.timeout' x 100
+ * 'low'    Session timeout in 'Session.timeout' x 300
+ *
+ * CakePHP session IDs are also regenerated between requests if
+ * 'Security.level' is set to 'high'.
  */
 	Configure::write('Security.level', 'medium');
 
@@ -279,48 +296,9 @@
  * 		'servers' => array(
  * 			'127.0.0.1:11211' // localhost, default port 11211
  * 		), //[optional]
- * 		'persistent' => true, // [optional] set this to false for non-persistent connections
  * 		'compress' => false, // [optional] compress data in Memcache (slower, but uses less memory)
+ * 		'persistent' => true, // [optional] set this to false for non-persistent connections
  *	));
  *
  */
-
-/**
- * Pick the caching engine to use.  If APC is enabled use it.
- * If running via cli - apc is disabled by default. ensure it's available and enabled in this case
- *
- */
-$engine = 'File';
-if (extension_loaded('apc') && (php_sapi_name() !== 'cli' || ini_get('apc.enable_cli'))) {
-	$engine = 'Apc';
-}
-
-// In development mode, caches should expire quickly.
-$duration = '+999 days';
-if (Configure::read('debug') >= 1) {
-	$duration = '+10 seconds';
-}
-
-/**
- * Configure the cache used for general framework caching.  Path information,
- * object listings, and translation cache files are stored with this configuration.
- */
-Cache::config('_cake_core_', array(
-	'engine' => $engine,
-	'prefix' => 'cake_core_',
-	'path' => CACHE . 'persistent' . DS,
-	'serialize' => ($engine === 'File'),
-	'duration' => $duration
-));
-
-/**
- * Configure the cache for model, and datasource caches.  This cache configuration
- * is used to store schema descriptions, and table listings in connections.
- */
-Cache::config('_cake_model_', array(
-	'engine' => $engine,
-	'prefix' => 'cake_model_',
-	'path' => CACHE . 'models' . DS,
-	'serialize' => ($engine === 'File'),
-	'duration' => $duration
-));
+	Cache::config('default', array('engine' => 'File'));

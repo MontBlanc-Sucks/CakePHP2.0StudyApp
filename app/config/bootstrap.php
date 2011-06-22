@@ -1,14 +1,11 @@
 <?php
 /**
- * This file is loaded automatically by the app/webroot/index.php file after core.php
+ * This file is loaded automatically by the app/webroot/index.php file after the core bootstrap.php
  *
- * This file should load/create any application wide configuration settings, such as 
- * Caching, Logging, loading additional configuration files.
+ * This is an application wide file to load any function that is not used within a class
+ * define. You can also use this to include or require any files in your application.
  *
- * You should also use this file to include any files that provide global functions/constants
- * that your application uses.
- *
- * PHP 5
+ * PHP versions 4 and 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -18,16 +15,15 @@
  *
  * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.config
+ * @package       cake
+ * @subpackage    cake.app.config
  * @since         CakePHP(tm) v 0.10.8.2117
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-// Setup a 'default' cache configuration for use in the application.
-Cache::config('default', array('engine' => 'File'));
-
 /**
  * The settings below can be used to set additional paths to models, views and controllers.
+ * This is related to Ticket #470 (https://trac.cakephp.org/ticket/470)
  *
  * App::build(array(
  *     'plugins' => array('/full/path/to/plugins/', '/next/full/path/to/plugins/'),

@@ -5,7 +5,7 @@
  *
  * Use it to configure database for ACL
  *
- * PHP 5
+ * PHP versions 4 and 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -15,7 +15,8 @@
  *
  * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.config.sql
+ * @package       cake
+ * @subpackage    cake.app.config.sql
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -27,7 +28,16 @@
  */
 class DbAclSchema extends CakeSchema {
 
-	public $acos = array(
+	var $name = 'DbAcl';
+
+	function before($event = array()) {
+		return true;
+	}
+
+	function after($event = array()) {
+	}
+
+	var $acos = array(
 			'id' => array('type'=>'integer', 'null' => false, 'default' => NULL, 'length' => 10, 'key' => 'primary'),
 			'parent_id' => array('type'=>'integer', 'null' => true, 'default' => NULL, 'length' => 10),
 			'model' => array('type'=>'string', 'null' => true),
@@ -38,7 +48,7 @@ class DbAclSchema extends CakeSchema {
 			'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1))
 		);
 
-	public $aros = array(
+	var $aros = array(
 			'id' => array('type'=>'integer', 'null' => false, 'default' => NULL, 'length' => 10, 'key' => 'primary'),
 			'parent_id' => array('type'=>'integer', 'null' => true, 'default' => NULL, 'length' => 10),
 			'model' => array('type'=>'string', 'null' => true),
@@ -49,7 +59,7 @@ class DbAclSchema extends CakeSchema {
 			'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1))
 		);
 
-	public $aros_acos = array(
+	var $aros_acos = array(
 			'id' => array('type'=>'integer', 'null' => false, 'default' => NULL, 'length' => 10, 'key' => 'primary'),
 			'aro_id' => array('type'=>'integer', 'null' => false, 'length' => 10, 'key' => 'index'),
 			'aco_id' => array('type'=>'integer', 'null' => false, 'length' => 10),

@@ -5,7 +5,7 @@
  *
  * Use it to configure database for Sessions
  *
- * PHP 5
+ * PHP versions 4 and 5
  *
  * CakePHP(tm) : Rapid Development Framework (http://cakephp.org)
  * Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
@@ -15,7 +15,8 @@
  *
  * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app.config.sql
+ * @package       cake
+ * @subpackage    cake.app.config.sql
  * @since         CakePHP(tm) v 0.2.9
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -27,7 +28,16 @@
  */
 class SessionsSchema extends CakeSchema {
 
-	public $cake_sessions = array(
+	var $name = 'Sessions';
+
+	function before($event = array()) {
+		return true;
+	}
+
+	function after($event = array()) {
+	}
+
+	var $cake_sessions = array(
 			'id' => array('type'=>'string', 'null' => false, 'key' => 'primary'),
 			'data' => array('type'=>'text', 'null' => true, 'default' => NULL),
 			'expires' => array('type'=>'integer', 'null' => true, 'default' => NULL),
