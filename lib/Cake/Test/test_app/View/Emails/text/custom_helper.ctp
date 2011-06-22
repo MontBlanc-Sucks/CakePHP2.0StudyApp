@@ -1,9 +1,5 @@
 <?php
 /**
- * Application model for Cake.
- *
- * This file is application-wide model file. You can put all
- * application-wide model-related methods here.
  *
  * PHP 5
  *
@@ -15,20 +11,9 @@
  *
  * @copyright     Copyright 2005-2011, Cake Software Foundation, Inc. (http://cakefoundation.org)
  * @link          http://cakephp.org CakePHP(tm) Project
- * @package       app
- * @since         CakePHP(tm) v 0.2.9
+ * @package       cake.libs.view.templates.pages
+ * @since         CakePHP(tm) v 2.0
  * @license       MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-
-App::uses('Model', 'Model');
-
-/**
- * Application model for Cake.
- *
- * Add your application-wide methods in the class below, your models
- * will inherit them.
- *
- * @package       app
- */
-class AppModel extends Model {
-}
+?>
+Right now: <?php echo $this->Time->toAtom($time); ?>

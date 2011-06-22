@@ -2,7 +2,7 @@
 /**
  * Datasource connection manager
  *
- * Provides an interface for loading and enumerating connections defined in app/config/database.php
+ * Provides an interface for loading and enumerating connections defined in app/Config/database.php
  *
  * PHP 5
  *
@@ -20,7 +20,6 @@
  */
 
 App::uses('DataSource', 'Model/Datasource');
-config('database');
 
 /**
  * Manages loaded instances of DataSource objects
@@ -54,7 +53,7 @@ class ConnectionManager {
 	protected static $_connectionsEnum = array();
 
 /**
- * Indicates if the init code for this class has alredy been executed
+ * Indicates if the init code for this class has already been executed
  *
  * @var boolean
  */
@@ -76,7 +75,7 @@ class ConnectionManager {
 /**
  * Gets a reference to a DataSource object
  *
- * @param string $name The name of the DataSource, as defined in app/config/database.php
+ * @param string $name The name of the DataSource, as defined in app/Config/database.php
  * @return object Instance
  * @throws MissingDatasourceConfigException
  * @throws MissingDatasourceFileException
@@ -107,6 +106,8 @@ class ConnectionManager {
 
 /**
  * Gets the list of available DataSource connections
+ * This will only return the datasources instantiated by this manager
+ * It differs from enumConnectionObjects, since the latter will return all configured connections
  *
  * @return array List of available connections
  */
@@ -133,15 +134,15 @@ class ConnectionManager {
 				return $name;
 			}
 		}
-		return '';
+		return null;
 	}
 
 /**
  * Loads the DataSource class for the given connection name
  *
- * @param mixed $connName A string name of the connection, as defined in app/config/database.php,
+ * @param mixed $connName A string name of the connection, as defined in app/Config/database.php,
  *                        or an array containing the filename (without extension) and class name of the object,
- *                        to be found in app/models/datasources/ or cake/libs/model/datasources/.
+ *                        to be found in app/Model/Datasource/ or lib/Cake/Model/Datasource/.
  * @return boolean True on success, null on failure or false if the class is already loaded
  * @throws MissingDatasourceFileException
  */
