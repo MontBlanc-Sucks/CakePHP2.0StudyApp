@@ -43,7 +43,7 @@
 		</div>
 		<div id="menu">
 			<ul>
-			<?php if ($this->Session->check('Auth.User')): ?>
+			<?php if (AuthComponent::user()): ?>
 				<li><?php echo $this->Html->link('Posts', array('controller' => 'posts', 'action' => 'index')) ?></li>
 				<li><?php echo $this->Html->link('Logout', array('controller' => 'users', 'action' => 'logout')) ?></li>
 			<?php else: ?>

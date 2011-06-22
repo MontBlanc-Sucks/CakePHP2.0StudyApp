@@ -41,4 +41,11 @@ class User extends AppModel {
 		),
 	);
 
+	public function beforeSave() {
+		if (!empty($this->data[$this->alias]['password'])) {
+			$this->set('password', AuthComponent::password($this->data[$this->alias]['password']));
+		}
+		return true;
+	}
+
 }

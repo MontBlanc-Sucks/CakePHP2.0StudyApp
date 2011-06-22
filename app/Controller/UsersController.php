@@ -20,7 +20,7 @@ class UsersController extends AppController {
  * @return void
  */
 	function register() {
-		if (!empty($this->request->data)) {
+		if ($this->request->is('post')) {
 			$this->User->create();
 			if ($this->User->save($this->request->data)) {
 				$this->Session->setFlash(__('The user has been saved'));
@@ -33,11 +33,19 @@ class UsersController extends AppController {
 	}
 
 	function login() {
+		if ($this->request->is('post')) {
+			if ($this->Auth->login()) {
+				$this->Auth->flash('Successfully logged in!');
+				$this->redirect($this->Auth->redirect());
+			} else {
+				$this->Auth->flash('Username or password was wrong');
+			}
+		}
 	}
 
 	function logout() {
 		$redirectTo = $this->Auth->logout();
-		$this->Session->setFlash('Successfully logged out');
+		$this->Auth->flash('Successfully logged out');
 		$this->redirect($redirectTo);
 	}
 

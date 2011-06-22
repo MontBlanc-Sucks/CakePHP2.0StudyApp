@@ -1,23 +1,23 @@
 <?php
 class PostsController extends AppController {
 
-	var $name = 'Posts';
+	public $name = 'Posts';
 
-	function index() {
+	public function index() {
 		$this->Post->recursive = 0;
 		$this->set('posts', $this->paginate());
 	}
 
-	function view($id = null) {
-		if (!$id) {
-			$this->Session->setFlash(__('Invalid post'));
-			$this->redirect(array('action' => 'index'));
+	public function view($id = null) {
+		$post = $this->Post->read(null, $id);
+		if (empty($post)) {
+			throw new NotFoundException(__('Invalid post'));
 		}
-		$this->set('post', $this->Post->read(null, $id));
+		$this->set(compact('post'));
 	}
 
-	function add() {
-		if (!empty($this->request->data)) {
+	public function add() {
+		if ($this->request->is('post')) {
 			$this->Post->create();
 			if ($this->Post->save($this->request->data)) {
 				$this->Session->setFlash(__('The post has been saved'));
@@ -28,12 +28,13 @@ class PostsController extends AppController {
 		}
 	}
 
-	function edit($id = null) {
-		if (!$id && empty($this->request->data)) {
-			$this->Session->setFlash(__('Invalid post'));
-			$this->redirect(array('action' => 'index'));
+	public function edit($id = null) {
+		$this->Post->id = $id;
+		if (!$this->Post->exists()) {
+			throw new NotFoundException(__('Invalid post'));
 		}
-		if (!empty($this->request->data)) {
+
+		if ($this->request->is('post')) {
 			if ($this->Post->save($this->request->data)) {
 				$this->Session->setFlash(__('The post has been saved'));
 				$this->redirect(array('action' => 'index'));
@@ -46,11 +47,16 @@ class PostsController extends AppController {
 		}
 	}
 
-	function delete($id = null) {
-		if (!$id) {
-			$this->Session->setFlash(__('Invalid id for post'));
-			$this->redirect(array('action'=>'index'));
+	public function delete($id = null) {
+		if (!$this->request->isPost()) {
+			throw new MethodNotAllowedException();
 		}
+
+		$this->Post->id = $id;
+		if (!$this->Post->exists()) {
+			throw new NotFoundException(__('Invalid post'));
+		}
+
 		if ($this->Post->delete($id)) {
 			$this->Session->setFlash(__('Post deleted'));
 			$this->redirect(array('action'=>'index'));
