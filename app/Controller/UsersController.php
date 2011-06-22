@@ -20,14 +20,14 @@ class UsersController extends AppController {
  * @return void
  */
 	function register() {
-		if (!empty($this->data)) {
+		if (!empty($this->request->data)) {
 			$this->User->create();
-			if ($this->User->save($this->data)) {
-				$this->Session->setFlash(__('The user has been saved', true));
+			if ($this->User->save($this->request->data)) {
+				$this->Session->setFlash(__('The user has been saved'));
 				$this->Auth->login($this->User->getLastInsertId());
 				$this->redirect(array('controller' => 'posts', 'action' => 'index'));
 			} else {
-				$this->Session->setFlash(__('The user could not be saved. Please, try again.', true));
+				$this->Session->setFlash(__('The user could not be saved. Please, try again.'));
 			}
 		}
 	}

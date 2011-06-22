@@ -74,7 +74,7 @@
 class DATABASE_CONFIG {
 
 	var $default = array(
-		'driver' => 'mysql',
+		'datasource' => 'Database/Mysql',
 		'persistent' => false,
 		'host' => 'localhost',
 		'login' => 'cake2sample',
@@ -85,7 +85,7 @@ class DATABASE_CONFIG {
 	);
 
 	var $test = array(
-		'driver' => 'mysql',
+		'datasource' => 'Database/Mysql',
 		'persistent' => false,
 		'host' => 'localhost',
 		'login' => 'user',
