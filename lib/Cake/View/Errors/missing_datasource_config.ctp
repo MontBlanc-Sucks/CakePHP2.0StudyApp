@@ -19,11 +19,11 @@
 <h2><?php echo __d('cake_dev', 'Missing Datasource Configuration'); ?></h2>
 <p class="error">
 	<strong><?php echo __d('cake_dev', 'Error'); ?>: </strong>
-	<?php echo __d('cake_dev', 'The datasource configuration %1$s was not found in databases.php.', '<em>' . $config . '</em>'); ?>
+	<?php echo __d('cake_dev', 'The datasource configuration %1$s was not found in database.php.', '<em>' . $config . '</em>'); ?>
 </p>
 <p class="notice">
 	<strong><?php echo __d('cake_dev', 'Notice'); ?>: </strong>
-	<?php echo __d('cake_dev', 'If you want to customize this error message, create %s', APP_DIR . DS . 'views' . DS . 'errors' . DS . 'missing_datasource_config.ctp'); ?>
+	<?php echo __d('cake_dev', 'If you want to customize this error message, create %s', APP_DIR . DS . 'View' . DS . 'Errors' . DS . 'missing_datasource_config.ctp'); ?>
 </p>
 
 <?php echo $this->element('exception_stack_trace'); ?>

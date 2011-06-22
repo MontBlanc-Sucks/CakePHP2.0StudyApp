@@ -92,7 +92,7 @@ class Sqlserver extends DboSource {
 		'timestamp' => array('name' => 'timestamp', 'format' => 'Y-m-d H:i:s', 'formatter' => 'date'),
 		'time'		=> array('name' => 'datetime', 'format' => 'H:i:s', 'formatter' => 'date'),
 		'date'		=> array('name' => 'datetime', 'format' => 'Y-m-d', 'formatter' => 'date'),
-		'binary'	=> array('name' => 'image'),
+		'binary'	=> array('name' => 'varbinary'),
 		'boolean'	=> array('name' => 'bit')
 	);
 
@@ -113,6 +113,8 @@ class Sqlserver extends DboSource {
  * @var string
  */
 	private $__lastQueryHadError = false;
+
+	const ROW_COUNTER = '_cake_page_rownum_';
 
 /**
  * Connects to the database using options in the given configuration array.
@@ -190,7 +192,7 @@ class Sqlserver extends DboSource {
 		if ($cache != null) {
 			return $cache;
 		}
-		$fields = false;
+		$fields = array();
 		$table = $this->fullTableName($model, false);
 		$cols = $this->_execute("SELECT COLUMN_NAME as Field, DATA_TYPE as Type, COL_LENGTH('" . $table . "', COLUMN_NAME) as Length, IS_NULLABLE As [Null], COLUMN_DEFAULT as [Default], COLUMNPROPERTY(OBJECT_ID('" . $table . "'), COLUMN_NAME, 'IsIdentity') as [Key], NUMERIC_SCALE as Size FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" . $table . "'");
 		if (!$cols) {
@@ -221,60 +223,15 @@ class Sqlserver extends DboSource {
 			if (in_array($fields[$field]['type'], array('date', 'time', 'datetime', 'timestamp'))) {
 				$fields[$field]['length'] = null;
 			}
+			if ($fields[$field]['type'] == 'float' && !empty($column->Size)) {
+				$fields[$field]['length'] = $fields[$field]['length'] . ',' . $column->Size;
+			}
 		}
 		$this->__cacheDescription($table, $fields);
 		$cols->closeCursor();
 		return $fields;
 	}
 
-/**
- * Returns a quoted and escaped string of $data for use in an SQL statement.
- *
- * @param string $data String to be prepared for use in an SQL statement
- * @param string $column The column into which this data will be inserted
- * @param boolean $safe Whether or not numeric data should be handled automagically if no column data is provided
- * @return string Quoted and escaped data
- */
-	public function value($data, $column = null, $safe = false) {
-		$parent = parent::value($data, $column, $safe);
-
-		if ($column === 'float' && strpos($data, '.') !== false) {
-			return rtrim($data, '0');
-		}
-		if ($parent === "''" && ($column === null || $column !== 'string')) {
-			return 'NULL';
-		}
-		if ($parent != null) {
-			return $parent;
-		}
-		if ($data === null) {
-			return 'NULL';
-		}
-		if (in_array($column, array('integer', 'float', 'binary')) && $data === '') {
-			return 'NULL';
-		}
-		if ($data === '') {
-			return "''";
-		}
-
-		switch ($column) {
-			case 'boolean':
-				$data = $this->boolean((bool)$data);
-			break;
-			default:
-				if (get_magic_quotes_gpc()) {
-					$data = stripslashes(str_replace("'", "''", $data));
-				} else {
-					$data = str_replace("'", "''", $data);
-				}
-			break;
-		}
-
-		if (in_array($column, array('integer', 'float', 'binary')) && is_numeric($data)) {
-			return $data;
-		}
-		return "'" . $data . "'";
-	}
 
 /**
  * Generates the fields list of an SQL query.
@@ -300,7 +257,6 @@ class Sqlserver extends DboSource {
 					$prepend = 'DISTINCT ';
 					$fields[$i] = trim(str_replace('DISTINCT', '', $fields[$i]));
 				}
-				$fieldAlias = count($this->_fieldMappings);
 
 				if (!preg_match('/\s+AS\s+/i', $fields[$i])) {
 					if (substr($fields[$i], -1) == '*') {
@@ -317,14 +273,14 @@ class Sqlserver extends DboSource {
 					}
 
 					if (strpos($fields[$i], '.') === false) {
-						$this->_fieldMappings[$alias . '__' . $fieldAlias] = $alias . '.' . $fields[$i];
+						$this->_fieldMappings[$alias . '__' . $fields[$i]] = $alias . '.' . $fields[$i];
 						$fieldName  = $this->name($alias . '.' . $fields[$i]);
-						$fieldAlias = $this->name($alias . '__' . $fieldAlias);
+						$fieldAlias = $this->name($alias . '__' . $fields[$i]);
 					} else {
 						$build = explode('.', $fields[$i]);
-						$this->_fieldMappings[$build[0] . '__' . $fieldAlias] = $fields[$i];
+						$this->_fieldMappings[$build[0] . '__' .$build[1]] = $fields[$i];
 						$fieldName  = $this->name($build[0] . '.' . $build[1]);
-						$fieldAlias = $this->name(preg_replace("/^\[(.+)\]$/", "$1", $build[0]) . '__' . $fieldAlias);
+						$fieldAlias = $this->name(preg_replace("/^\[(.+)\]$/", "$1", $build[0]) . '__' . $build[1]);
 					}
 					if ($model->getColumnType($fields[$i]) == 'datetime') {
 						$fieldName = "CONVERT(VARCHAR(20), {$fieldName}, 20)";
@@ -512,9 +468,20 @@ class Sqlserver extends DboSource {
 					$limit = preg_replace('/\s*offset.*$/i', '', $limit);
 					preg_match('/top\s+([0-9]+)/i', $limit, $limitVal);
 					$offset = intval($offset[1]) + intval($limitVal[1]);
-					$rOrder = $this->__switchSort($order);
-					list($order2, $rOrder) = array($this->__mapFields($order), $this->__mapFields($rOrder));
-					return "SELECT * FROM (SELECT {$limit} * FROM (SELECT TOP {$offset} {$fields} FROM {$table} {$alias} {$joins} {$conditions} {$group} {$order}) AS Set1 {$rOrder}) AS Set2 {$order2}";
+					if (!$order) {
+						$order = 'ORDER BY (SELECT NULL)';
+					}
+
+					$rowCounter = self::ROW_COUNTER;
+					$pagination = "
+						SELECT {$limit} * FROM (
+							SELECT {$fields}, ROW_NUMBER() OVER ({$order}) AS {$rowCounter}
+							FROM {$table} {$alias} {$joins} {$conditions} {$group}
+						) AS _cake_paging_
+						WHERE _cake_paging_.{$rowCounter} >= {$offset}
+						ORDER BY _cake_paging_.{$rowCounter}
+					";
+					return $pagination;
 				} else {
 					return "SELECT {$limit} {$fields} FROM {$table} {$alias} {$joins} {$conditions} {$group} {$order}";
 				}
@@ -543,35 +510,6 @@ class Sqlserver extends DboSource {
 	}
 
 /**
- * Reverses the sort direction of ORDER statements to get paging offsets to work correctly
- *
- * @param string $order
- * @return string
- */
-	private function __switchSort($order) {
-		$order = preg_replace('/\s+ASC/i', '__tmp_asc__', $order);
-		$order = preg_replace('/\s+DESC/i', ' ASC', $order);
-		return preg_replace('/__tmp_asc__/', ' DESC', $order);
-	}
-
-/**
- * Translates field names used for filtering and sorting to shortened names using the field map
- *
- * @param string $sql A snippet of SQL representing an ORDER or WHERE statement
- * @return string The value of $sql with field names replaced
- */
-	private function __mapFields($sql) {
-		if (empty($sql) || empty($this->_fieldMappings)) {
-			return $sql;
-		}
-		foreach ($this->_fieldMappings as $key => $val) {
-			$sql = preg_replace('/' . preg_quote($val) . '/', $this->name($key), $sql);
-			$sql = preg_replace('/' . preg_quote($this->name($val)) . '/', $this->name($key), $sql);
-		}
-		return $sql;
-	}
-
-/**
  * Returns an array of all result rows for a given SQL query.
  * Returns false if no rows matched.
  *
@@ -586,7 +524,8 @@ class Sqlserver extends DboSource {
 	}
 
 /**
- * Fetches the next row from the current result set
+ * Fetches the next row from the current result set.
+ * Eats the magic ROW_COUNTER variable.
  *
  * @return mixed
  */
@@ -595,6 +534,9 @@ class Sqlserver extends DboSource {
 			$resultRow = array();
 			foreach ($this->map as $col => $meta) {
 				list($table, $column, $type) = $meta;
+				if ($table === 0 && $column === self::ROW_COUNTER) {
+					continue;
+				}
 				$resultRow[$table][$column] = $row[$col];
 				if ($type === 'boolean' && !is_null($row[$col])) {
 					$resultRow[$table][$column] = $this->boolean($resultRow[$table][$column]);
@@ -748,6 +690,25 @@ class Sqlserver extends DboSource {
 			$this->error = $e->getMessage();
 			return false;
 		}
+	}
+
+/**
+ * Generate a "drop table" statement for the given Schema object
+ *
+ * @param CakeSchema $schema An instance of a subclass of CakeSchema
+ * @param string $table Optional.  If specified only the table name given will be generated.
+ *   Otherwise, all tables defined in the schema are generated.
+ * @return string
+ */
+	public function dropSchema(CakeSchema $schema, $table = null) {
+		$out = '';
+		foreach ($schema->tables as $curTable => $columns) {
+			if (!$table || $table == $curTable) {
+				$t =  $this->fullTableName($curTable);
+				$out .= "IF OBJECT_ID('" . $this->fullTableName($curTable, false). "', 'U') IS NOT NULL DROP TABLE " .  $this->fullTableName($curTable) . ";\n";
+			}
+		}
+		return $out;
 	}
 
 }
