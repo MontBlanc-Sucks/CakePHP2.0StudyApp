@@ -1,5 +1,7 @@
 <?php
 /* PostsController Test cases generated on: 2011-06-23 19:18:51 : 1308824331*/
+App::uses('Controller', 'Controller');
+App::uses('AppController', 'Controller');
 App::uses('PostsController', 'Controller');
 
 /**
