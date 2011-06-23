@@ -41,7 +41,7 @@ class PostsControllerTestCase extends ControllerTestCase {
 		parent::setUp();
 
 		$this->PostsController = new TestPostsController();
-		$this->Posts->constructClasses();
+		$this->PostsController->constructClasses();
 	}
 /**
  * tearDown method
