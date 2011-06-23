@@ -55,4 +55,9 @@ class PostsControllerTestCase extends ControllerTestCase {
 		parent::tearDown();
 	}
 
+	public function testIndex() {
+		$this->testAction('/posts/index');
+		$this->assertType('array', $this->vars['posts']);
+	}
+
 }
