@@ -31,7 +31,7 @@ class TestPostsController extends PostsController {
  * PostsController Test Case
  *
  */
-class PostsControllerTestCase extends CakeTestCase {
+class PostsControllerTestCase extends ControllerTestCase {
 /**
  * setUp method
  *
