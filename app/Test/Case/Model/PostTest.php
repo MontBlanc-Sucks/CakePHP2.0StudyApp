@@ -45,17 +45,17 @@ class PostTestCase extends CakeTestCase {
 		// 期待する結果
 		$expected = true;
 		// テスト実行
-		$this->assertEqual($result, $expected);
+		$this->assertEquals($result, $expected);
 		// テスト 2
 		$this->Post->create(array('title' => 'タイトルあり'));
 		$result = array_key_exists('title', $this->Post->invalidFields());
 		$expected = false;
-		$this->assertEqual($result, $expected);
+		$this->assertEquals($result, $expected);
 		// テスト 3
 		$this->Post->create(array('title' => '12345678901'));
 		$result = $this->Post->invalidFields();
 		$expected = array('cannot write over 10 characters');
-		$this->assertEqual($result['title'], $expected);
+		$this->assertEquals($result['title'], $expected);
 		// テスト 4
 		$this->Post->create(array('title' => '1234567890'));
 		$result = array_key_exists('title', $this->Post->invalidFields());
