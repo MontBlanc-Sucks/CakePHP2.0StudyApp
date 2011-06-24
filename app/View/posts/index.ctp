@@ -12,7 +12,7 @@
 		<td><?php echo h($post['Post']['body']); ?>&nbsp;</td>
 		<td class="actions">
 			<?php echo $this->Html->link('Edit', array('action' => 'edit', $post['Post']['id'])); ?>
-			<?php echo $this->Html->link('Delete', array('action' => 'delete', $post['Post']['id']), null, "Are you sure you want to delete # {$post['Post']['id']}?"); ?>
+			<?php echo $this->Form->postLink('Delete', array('action' => 'delete', $post['Post']['id']), null, "Are you sure you want to delete # {$post['Post']['id']}?"); ?>
 		</td>
 	</tr>
 <?php endforeach; ?>
